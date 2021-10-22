@@ -56,7 +56,8 @@ class BookController extends Controller {
     const lastTime = $p.eq(5).text().split('：')[1];
     const lastChapter = $p.eq(6).text().split('：')[1];
     const lastChapterLink = $p.eq(6).find('a').attr('href');
-    const chaperLink = $('.ablum_read>span').eq(1).find('a').attr('href');
+    const chaperLink = $('.ablum_read>span').eq(1).find('a')
+      .attr('href');
 
     ctx.helper.success({
       ctx,
@@ -70,8 +71,8 @@ class BookController extends Controller {
         status,
         lastTime,
         lastChapter,
-        lastChapterLink,
-        chaperLink,
+        lastChapterId: Crypto.base64Enc(lastChapterLink),
+        chaperId: Crypto.base64Enc(chaperLink),
         intro: introInfo.text(),
       },
     });
@@ -80,8 +81,10 @@ class BookController extends Controller {
   // 获取小说章节
   async getChapter() {
     const { ctx } = this;
-    const { link } = ctx.params;
-    const res = await ctx.service.creeper.get(`${cheeperUri}/${link}_1/`);
+    const { id } = ctx.params;
+    const { count } = ctx.query;
+    const link = parseIdToLink(id);
+    const res = await ctx.service.creeper.get(`${cheeperUri}/${link}_${count}/`);
     const $ = cheeper.getDom(res.data);
     const $chapters = $('.cover .chapter>li');
     const list = [];
@@ -89,7 +92,7 @@ class BookController extends Controller {
       const $a = $(li).find('a');
       list.push({
         title: $a.text(),
-        link: $a.attr('href'),
+        id: Crypto.base64Enc($a.attr('href')),
       });
     });
     ctx.helper.success({ ctx, res: list });
@@ -98,7 +101,8 @@ class BookController extends Controller {
   // 获取章节内容
   async getContent() {
     const { ctx } = this;
-    const { link } = ctx.params;
+    const { id } = ctx.params;
+    const link = parseIdToLink(id);
     const res = await ctx.service.creeper.get(`${cheeperUri}/${link}/`);
     const $ = cheeper.getDom(res.data);
     const content = $('#content .text');
@@ -115,6 +119,12 @@ class BookController extends Controller {
       ctx.helper.fail({ ctx });
     }
   }
+}
+
+function parseIdToLink(id) {
+  const link = Crypto.base64Dec(id);
+  const _link = link.replace(/\//g, '');
+  return _link;
 }
 
 async function cheeperClass(ctx, html) {
