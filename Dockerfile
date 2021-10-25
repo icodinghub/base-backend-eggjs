@@ -22,7 +22,7 @@ COPY package.json /front/node-app/package.json
 
 # 安装npm依赖(使用淘宝的镜像源)
 # 如果使用的境外服务器，无需使用淘宝的镜像源，即改为`RUN npm i`。
-RUN npm i
+RUN npm i --production
 
 # 拷贝所有源代码到工作目录
 COPY . /front/node-app
@@ -31,4 +31,4 @@ COPY . /front/node-app
 EXPOSE 7001
 
 # 启动node应用
-CMD yarn start
+CMD npm run start

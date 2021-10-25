@@ -7,6 +7,15 @@ const Crypto = require('../utils/crypto');
 const cheeperUri = 'http://m.b520.cc';
 
 class BookController extends Controller {
+  // 搜索
+  async queryBook() {
+    const { ctx } = this;
+    const { keyword } = ctx.query;
+    const res = await ctx.service.creeper.get(`${cheeperUri}/modules/article/waps.php?keyword=${keyword}/`);
+    const $ = cheeper.getDom(res.data);
+    const list = parseCheeperCoverList($);
+    ctx.helper.success({ ctx, res: list });
+  }
   // 获取排行
   async getRanking() {
     const { ctx } = this;
@@ -149,8 +158,16 @@ async function cheeperClassList(ctx) {
   const classId = Crypto.base64Dec(link);
   const res = await ctx.service.creeper.get(`${cheeperUri}/${classId}/`);
   const $ = cheeper.getDom(res.data);
+  return parseCheeperCoverList($);
+}
+
+function parseCheeperCoverList($) {
   const cover = $('.cover');
   const list = [];
+  const $lines = cover.find('.line');
+  if (!$lines) {
+    return [];
+  }
   cover.find('.line').each((index, p) => {
     const $a = $(p).find('a');
     const tag = $a.eq(0).text();
