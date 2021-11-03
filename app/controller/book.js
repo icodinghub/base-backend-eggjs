@@ -7,6 +7,7 @@ const Crypto = require('../utils/crypto');
 const cheeperUri = 'http://m.b520.cc';
 
 class BookController extends Controller {
+
   // 搜索
   async queryBook() {
     const { ctx } = this;

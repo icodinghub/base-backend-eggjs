@@ -18,7 +18,6 @@ class UserController extends Controller {
       ctx.helper.fail({ ctx, msg: '用户名已注册！' });
       return;
     }
-    
     await ctx.service.user.register({ username, password });
     ctx.helper.success({ ctx, msg: '用户注册成功！' });
   }

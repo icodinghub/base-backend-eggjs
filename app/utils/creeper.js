@@ -9,8 +9,8 @@ const iconv = require('iconv-lite');
 const cheerio = require('cheerio');
 
 module.exports = {
-  getDom(body) {
-    const html = iconv.decode(body, 'gbk');
+  getDom(body, encoding = 'gbk') {
+    const html = iconv.decode(body, encoding);
     const $ = cheerio.load(html, { decodeEntities: false });
     return $;
   },
